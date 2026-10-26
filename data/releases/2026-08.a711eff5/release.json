@@ -1,0 +1,170 @@
+{
+ "changes": {
+  "new": [],
+  "revised": []
+ },
+ "created_at": "2026-10-25T23:41:13Z",
+ "data_through": "2026-08",
+ "geography_vintage": 2025,
+ "git_commit": null,
+ "inputs_sha256": "a711eff52ebdd9913b664e410a7ffd11bcd4fc9d7180f03b9b17c56e9bbde7e8",
+ "population_vintage": 2025,
+ "processing_version": "1.0.0",
+ "summary": "Data through 2026-08",
+ "ttm_complete_counties": 3013,
+ "us_ttm_official": 1423282,
+ "validation": {
+  "fail": 0,
+  "pass": 22,
+  "warn": 1
+ },
+ "validation_report": {
+  "checks": [
+   {
+    "detail": "665 county files checked",
+    "id": "fips_format",
+    "status": "pass",
+    "title": "County FIPS are five digits and unique within every file"
+   },
+   {
+    "detail": "statewide offices (county 000) excluded by design; unjoined: none; 18 legacy codes appear only in history",
+    "id": "geo_join",
+    "status": "pass",
+    "title": "Every county in the current input files joins to a boundary polygon"
+   },
+   {
+    "detail": "3144 county equivalents (50 states + DC); every county assigned exactly one coverage class",
+    "id": "universe",
+    "status": "pass",
+    "title": "Boundary universe, metrics table and classification agree"
+   },
+   {
+    "detail": "PEP vintage 2025: 3144 of 3144 matched; unmatched none",
+    "id": "population_join",
+    "status": "pass",
+    "title": "Every county has an official population estimate"
+   },
+   {
+    "detail": "negative values: 0",
+    "id": "nonnegative",
+    "status": "pass",
+    "title": "No negative housing-unit counts are published"
+   },
+   {
+    "detail": "checked 3004 TTM and 3024 calendar-year county rows",
+    "id": "aggregation",
+    "status": "pass",
+    "title": "Total = single-family + multifamily; multifamily = 2 + 3-4 + 5+ units"
+   },
+   {
+    "detail": "256 counties x 4 series checked; mismatches: none",
+    "id": "ttm_independent",
+    "status": "pass",
+    "title": "TTM values match an independent row-by-row recomputation"
+   },
+   {
+    "detail": "current 2025-09..2026-08, prior 2024-09..2025-08; prior equals the TTM series 12 months earlier",
+    "id": "periods",
+    "status": "pass",
+    "title": "Current and prior windows are consecutive, non-overlapping 12-month periods"
+   },
+   {
+    "detail": "2771 defined; 242 counties with zero prior permits have undefined YoY",
+    "id": "yoy",
+    "status": "pass",
+    "title": "YoY = (current / prior - 1) x 100; undefined when prior is zero"
+   },
+   {
+    "detail": "vintage 2025, July 1 2025; min population 52",
+    "id": "per_capita",
+    "status": "pass",
+    "title": "Per-1,000 rates use the official population denominator"
+   },
+   {
+    "detail": "983040 rows; 0 duplicates",
+    "id": "no_duplicates",
+    "status": "pass",
+    "title": "No duplicate county-period rows in processed history"
+   },
+   {
+    "detail": "129 universe counties absent from the latest YTD file are all N/A",
+    "id": "missing_not_zero",
+    "status": "pass",
+    "title": "Counties absent from source files are N/A, never 0"
+   },
+   {
+    "detail": "complete: 3013, current_only: 0, incomplete: 4, annual_only: 7, not_in_bps: 120 (of 3144)",
+    "id": "coverage_quantified",
+    "status": "pass",
+    "title": "Counties without comparable data are identified and counted"
+   },
+   {
+    "detail": "dates valid; gaps since 2022-01: none",
+    "id": "source_dates",
+    "status": "pass",
+    "title": "Source files are dated after their survey month and the monthly series has no gaps"
+   },
+   {
+    "detail": "1 unavailable: co1504c.txt; affected months are N/A in history",
+    "id": "unavailable_sources",
+    "status": "warn",
+    "title": "Files Census refuses to serve are recorded, not substituted"
+   },
+   {
+    "detail": "0 revised file(s) this run; every build recomputes all periods from raw files",
+    "id": "revisions",
+    "status": "pass",
+    "title": "Revised source files are detected by hash and fully reprocessed"
+   },
+   {
+    "detail": "header rows, column counts, survey dates and numeric fields validated for every file",
+    "id": "schema",
+    "status": "pass",
+    "title": "Source layouts match the verified BPS, PEP and boundary schemas"
+   },
+   {
+    "detail": "2026-08 YTD: counties (incl. statewide offices) 969,489 vs U.S. 968,187 (0.13%; tolerance 1.0%)",
+    "id": "national_recon",
+    "status": "pass",
+    "title": "County YTD sum reconciles to the official U.S. total"
+   },
+   {
+    "detail": "counties 1,421,793 + statewide offices 3,095 vs U.S. 1,423,282 (0.11%)",
+    "id": "national_ttm_recon",
+    "status": "pass",
+    "title": "County TTM sum reconciles to the official U.S. TTM"
+   },
+   {
+    "detail": "tolerance 3% (min 50 units); outside: none",
+    "id": "state_recon",
+    "status": "pass",
+    "title": "County YTD sums reconcile to official state totals"
+   },
+   {
+    "detail": "county/U.S. ratio 1.0013; full coverage since 2022-01",
+    "id": "coverage_regime",
+    "status": "pass",
+    "title": "Latest monthly county files cover the full permit-issuing universe"
+   },
+   {
+    "detail": "3020 -> 3020 (0.00%)",
+    "id": "rowcount",
+    "status": "pass",
+    "title": "Number of counties in the latest file is stable month over month"
+   },
+   {
+    "detail": "56 files, 35.1 MB",
+    "id": "artifacts",
+    "status": "pass",
+    "title": "Web artifacts are complete and parseable JSON"
+   }
+  ],
+  "counts": {
+   "fail": 0,
+   "pass": 22,
+   "warn": 1
+  },
+  "status": "pass"
+ },
+ "version": "2026-08.a711eff5"
+}

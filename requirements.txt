@@ -1,0 +1,9 @@
+# Pipeline dependencies (pinned for reproducible builds; certifi floats so CA roots stay current).
+numpy==2.5.4
+pandas==3.1.0
+pyarrow==26.0.0
+pyproj==3.8.0
+pyshp==3.1.6
+requests==2.34.2
+certifi>=2024.8.30
+pytest==9.1.1

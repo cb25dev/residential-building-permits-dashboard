@@ -1,0 +1,6 @@
+Survey,FIPS,FIPS,Region,Division,County,,1-unit,,,2-units,,,3-4 units,,,5+ units,,,1-unit rep,,,2-units rep,,,3-4 units rep,,, 5+units rep
+Date,State,County,Code,Code,Name,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value
+ 
+202608,01,001,3,6,Synthetic County A                                          ,10,10,1000000,1,2,200000,1,4,300000,2,100,9000000,8,8,800000,1,2,200000,0,0,0,2,100,9000000
+202608,01,003,3,6,Synthetic County B                                          ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+202608,35,000,4,8,Synthetic Balance of State                                  ,5,5,500000,0,0,0,0,0,0,0,0,0,5,5,500000,0,0,0,0,0,0,0,0,0

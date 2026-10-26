@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bpsdash"
+version = "1.0.0"
+description = "Census Building Permits Survey county pipeline for the Residential Building Permits dashboard"
+requires-python = ">=3.11"
+dependencies = [
+  "pandas>=2.2",
+  "pyarrow>=15",
+  "numpy>=1.26",
+  "pyproj>=3.6",
+  "pyshp>=2.3",
+  "requests>=2.31",
+  "certifi>=2024.2.2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+addopts = "-q"

@@ -1,0 +1,97 @@
+# Builds the dashboard from the committed raw Census files (offline, deterministic),
+# re-runs validation and all tests, and deploys to GitHub Pages. Runs on every push to
+# main, after a successful data refresh, or manually. Pull requests build and test but
+# never deploy. If any step fails, the previously deployed site stays live.
+name: Build and deploy dashboard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # After a data refresh this must be the new commit on main, not the
+          # commit that triggered the refresh run.
+          ref: ${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install pipeline dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Restore parse cache
+        uses: actions/cache@v4
+        with:
+          path: data/.cache
+          key: parse-cache-${{ hashFiles('data/raw/manifest.json') }}
+          restore-keys: parse-cache-
+
+      - name: Rebuild data artifacts from committed raw files and validate
+        env:
+          PYTHONPATH: scripts
+        run: python -m bpsdash build --report validation-report.json
+
+      - name: Pipeline tests
+        env:
+          PYTHONPATH: scripts
+        run: python -m pytest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - name: Browser smoke tests (real data, production build)
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report-${{ github.run_id }}
+          path: validation-report.json
+          retention-days: 90
+          if-no-files-found: warn
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

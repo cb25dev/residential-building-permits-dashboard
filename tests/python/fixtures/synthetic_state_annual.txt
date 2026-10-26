@@ -1,0 +1,6 @@
+Survey,FIPS,Region,Division,State,,1-unit,,,2-units,,,3-4 units,,,5+ units,,,1-unit rep,,,2-units rep,,,3-4 units rep,,,       5+ units rep
+Date,State,Code,Code,Name,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,      Bldgs,Units,Value,Bldgs,Units,Value,      Bldgs,Units,Value,Bldgs,Units,Value
+ 
+202599,US,0,0,United States,15,15,1500,1,2,200,1,4,300,2,100,9000,13,13,1300,1,2,200,0,0,0,2,100,9000
+202599,R3,3,0,South Region,10,10,1000,1,2,200,1,4,300,2,100,9000,8,8,800,1,2,200,0,0,0,2,100,9000
+202599,01,3,6,Alabama,10,10,1000,1,2,200,1,4,300,2,100,9000,8,8,800,1,2,200,0,0,0,2,100,9000

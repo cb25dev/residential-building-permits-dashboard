@@ -1,0 +1,24 @@
+# toolchains
+.venv/
+.tools/
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# build outputs (regenerated deterministically from committed raw data)
+dist/
+data/processed/
+public/data/
+data/.staging/
+data/.cache/
+test-results/
+playwright-report/
+
+# local-only scratch downloads
+data/.downloads/
+.DS_Store
+
+# packaging / compiler byproducts
+*.egg-info/
+*.tsbuildinfo

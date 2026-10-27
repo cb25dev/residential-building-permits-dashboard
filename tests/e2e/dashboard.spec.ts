@@ -90,3 +90,23 @@ test('calendar-year view and comparison', async ({ page }) => {
   await boxes.nth(1).check();
   await expect(page.locator('section.compare tbody tr')).toHaveCount(2);
 });
+
+test('land opportunity score: heatmap, adjustable weights, rankings and county breakdown', async ({ page }) => {
+  await ready(page);
+  await page.getByRole('radio', { name: 'Land Opportunity Score' }).click();
+  await expect(page.locator('.legend-title')).toContainText('Land Opportunity Score');
+  await expect(page.locator('.weights')).toBeVisible();
+  await expect(page.getByRole('combobox').filter({ hasText: 'Land Opportunity Score' }).first()).toBeVisible();
+  const before = await page.locator('.rankings tbody tr').first().innerText();
+  await page.getByLabel('Momentum (YoY) weight').fill('0');
+  await page.getByLabel('Permit volume weight').fill('100');
+  await expect(page).toHaveURL(/w=100,0,/);
+  const after = await page.locator('.rankings tbody tr').first().innerText();
+  expect(after).not.toEqual(before);
+  // With volume at 100%, the top-ranked county is the one with the most permits among scored counties.
+  await page.locator('.rankings tbody tr').first().click();
+  await expect(page.locator('.score-section')).toContainText('Score (0–100)');
+  await expect(page.locator('.score-section')).toContainText('#1');
+  await page.getByRole('button', { name: 'Reset weights' }).click();
+  await expect(page).not.toHaveURL(/w=/);
+});

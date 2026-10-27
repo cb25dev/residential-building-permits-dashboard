@@ -49,6 +49,10 @@ export function buildCounties(m: MetricsFile, geo: GeoIndex): County[] {
       idx: i, geoid, name: g.name, short: g.short, st: g.st, state: g.state, statefp: g.statefp, bbox: g.bbox,
       ttm: viewRow(m.ttm, i), annual: viewRow(m.annual, i),
       recon: { decYtd: m.recon.dec_ytd[i], annual: m.recon.annual[i] },
+      growth: {
+        pop3: m.growth.pop_3y[i], p3All: m.growth.permits_3y_all[i], p3Sf: m.growth.permits_3y_sf[i],
+        p3BaseAll: m.growth.permits_base_all[i], p3BaseSf: m.growth.permits_base_sf[i],
+      },
     };
   });
 }

@@ -19,7 +19,7 @@ function vr(p: Partial<ViewRow> & { total: number | null; prior: number | null; 
   };
 }
 function county(geoid: string, name: string, v: ViewRow): County {
-  return { idx: 0, geoid, name, short: name, st: 'TX', state: 'Texas', statefp: geoid.slice(0, 2), bbox: [0, 0, 1, 1], ttm: v, annual: v, recon: { decYtd: null, annual: null } };
+  return { idx: 0, geoid, name, short: name, st: 'TX', state: 'Texas', statefp: geoid.slice(0, 2), bbox: [0, 0, 1, 1], ttm: v, annual: v, recon: { decYtd: null, annual: null }, growth: { pop3: null, p3All: null, p3Sf: null, p3BaseAll: null, p3BaseSf: null } };
 }
 
 const A = county('48001', 'Alpha County', vr({ total: 1000, prior: 800, sf: 600 }));

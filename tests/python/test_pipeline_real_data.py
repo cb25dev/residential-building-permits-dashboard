@@ -76,3 +76,17 @@ def test_web_artifacts_have_no_hardcoded_or_missing_counties(built):
     assert len(mj["geoid"]) == 3144 and len(mj["ttm"]["cls"]) == 3144
     i = mj["geoid"].index("01003")
     assert mj["ttm"]["cur_total"][i] == 3093 or mj["ttm"]["cur_total"][i] is not None
+
+
+def test_growth_inputs_baldwin_hand_calculation(built):
+    b, _ = built
+    if b.notes["meta"]["growth"] != {"pop_from": 2022, "pop_to": 2025, "permits_from": 2022, "permits_to": 2025}:
+        pytest.skip("hand-derived values are for PEP V2025 and annual files through 2025")
+    i = _row(b, "01003")
+    # PEP V2025: POPESTIMATE2022 = 246,703; POPESTIMATE2025 = 267,761
+    assert b.notes["pop_growth"][i] == pytest.approx((267761 / 246703 - 1) * 100)
+    # co2022a total 3,417 (u1 3,141); co2025a total 2,665 (u1 2,517)
+    assert b.notes["g3_all"][i] == pytest.approx((2665 / 3417 - 1) * 100)
+    assert b.notes["g3_sf"][i] == pytest.approx((2517 / 3141 - 1) * 100)
+    # Connecticut planning regions did not exist in the 2022 annual file: N/A, not zero
+    assert np.isnan(b.notes["g3_all"][_row(b, "09110")])

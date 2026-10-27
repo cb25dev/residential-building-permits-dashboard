@@ -98,6 +98,8 @@ def write_release(meta: dict, report: dict, changes: dict) -> dict:
         parts.append(f"new reporting month (was {prev['data_through']})")
     if prev and prev["population_vintage"] != meta["population"]["vintage"]:
         parts.append(f"population vintage {prev['population_vintage']} -> {meta['population']['vintage']}")
+    if prev and prev.get("processing_version") != PROCESSING_VERSION:
+        parts.append(f"processing {prev.get('processing_version')} -> {PROCESSING_VERSION}")
     if changes.get("revised"):
         parts.append(f"{len(changes['revised'])} revised source file(s)")
     rec = {

@@ -4,6 +4,7 @@ export const METRIC_LABEL: Record<Metric, string> = {
   abs: 'Absolute Permits',
   yoy: 'YoY Growth',
   per: 'Permits / 1,000 Residents',
+  score: 'Land Opportunity Score',
 };
 
 export function metricTitle(metric: Metric, units: Units, view: View): string {
@@ -11,6 +12,7 @@ export function metricTitle(metric: Metric, units: Units, view: View): string {
   const per = view === 'ttm' ? 'trailing 12 months' : 'calendar year';
   if (metric === 'abs') return `Residential ${u} authorized, ${per}`;
   if (metric === 'yoy') return `Change in ${u} authorized vs prior ${view === 'ttm' ? '12 months' : 'year'}`;
+  if (metric === 'score') return `Land Opportunity Score (0–100, weighted national percentiles; ${units === 'sf' ? 'single-family' : 'all residential'})`;
   return `${units === 'sf' ? 'Single-family units' : 'Housing units'} authorized per 1,000 residents, ${per}`;
 }
 

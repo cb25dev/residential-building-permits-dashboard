@@ -25,7 +25,7 @@ function Segmented<T extends string>({ value, options, onChange, label, size = '
 }
 
 export function Controls({ meta, settings: s, set }: Props) {
-  const metrics: Metric[] = ['abs', 'yoy', 'per'];
+  const metrics: Metric[] = ['abs', 'yoy', 'per', 'score'];
   return (
     <div className="controls">
       <Segmented<Metric> label="Map metric" size="lg" value={s.metric} onChange={(metric) => set({ metric })}
@@ -44,6 +44,9 @@ export function Controls({ meta, settings: s, set }: Props) {
             { value: 'log', label: 'Log scale', title: 'Classes evenly spaced on a logarithmic scale' },
             { value: 'quantile', label: 'Quantiles', title: 'Each class holds roughly the same number of counties' },
           ]} />
+        )}
+        {s.metric === 'score' && s.units !== 'sf' && (
+          <span className="hint">Tip: single-family units track buildable-lot demand most closely.</span>
         )}
         {s.metric === 'yoy' && (
           <label className="check" title="Swap green for blue on the growth side (red–blue diverging scale for color-vision deficiencies)">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { fmtInt, fmtPct, fmtRate } from '../lib/format';
 import { CLASS_LABEL } from '../lib/labels';
 import { priorValue, row, type Filters, type Settings, type SortKey } from '../lib/model';
+import type { ScoreMap } from '../lib/score';
 import type { County, GeoIndex } from '../lib/types';
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
   onExport: () => void;
   periodLabel: string;
   lowBaseline: number;
+  scores?: ScoreMap;
 }
 
 const POP_STEPS = [0, 1_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000];
@@ -40,6 +42,9 @@ export function RankingsTable(p: Props) {
     { key: 'per', label: 'Per 1,000', num: true },
     { key: 'sf', label: 'Single-family', num: true },
     { key: 'mf', label: 'Multifamily', num: true, title: 'Units in buildings with 2 or more units' },
+    { key: 'g3', label: '3-yr permits', num: true, title: 'Change in final annual permits over three years' },
+    { key: 'pop3', label: 'Pop. 3-yr', num: true, title: 'Change in population estimate over three years' },
+    { key: 'score', label: 'Land score', num: true, title: 'Land Opportunity Score (0–100); weights adjustable when the score map is selected' },
     { key: 'cls', label: 'Coverage' },
   ];
   const clickSort = (key: SortKey) =>
@@ -71,12 +76,15 @@ export function RankingsTable(p: Props) {
         </label>
         <label>Sort by
           <select value={`${sort.key}:${sort.dir}`} onChange={(e) => { const [key, dir] = e.target.value.split(':'); p.setSort({ key: key as SortKey, dir: dir as 'asc' | 'desc' }); }}>
+            <option value="score:desc">Land Opportunity Score (high → low)</option>
             <option value="cur:desc">Current permits (high → low)</option>
             <option value="yoy:desc">YoY growth (high → low)</option>
             <option value="yoy:asc">YoY growth (low → high)</option>
             <option value="per:desc">Permits per 1,000 (high → low)</option>
             <option value="pop:desc">Population (high → low)</option>
             <option value="mf:desc">Multifamily units (high → low)</option>
+            <option value="g3:desc">3-year permit growth (high → low)</option>
+            <option value="pop3:desc">Population growth (high → low)</option>
             <option value="name:asc">County name (A → Z)</option>
           </select>
         </label>
@@ -85,7 +93,7 @@ export function RankingsTable(p: Props) {
           <button className="btn" onClick={p.onExport}>Export CSV</button>
         </div>
       </div>
-      {s.metric === 'yoy' && <p className="muted small">Growth view: counties with fewer than {fmtInt(f.minPrior)} prior-period {sf ? 'single-family ' : ''}units are excluded (default {p.lowBaseline}).</p>}
+      {(s.metric === 'yoy' || s.metric === 'score') && <p className="muted small">{s.metric === 'yoy' ? 'Growth' : 'Score'} view: counties with fewer than {fmtInt(f.minPrior)} prior-period {sf ? 'single-family ' : ''}units are excluded (default {p.lowBaseline}).</p>}
       <div className="table-wrap">
         <table className="table">
           <thead>
@@ -120,6 +128,9 @@ export function RankingsTable(p: Props) {
                   <td className="num">{fmtRate(sf ? r.per.sf : r.per.all)}</td>
                   <td className="num">{fmtInt(r.cur.u1)}</td>
                   <td className="num">{fmtInt(r.cur.mf)}</td>
+                  <td className="num">{fmtPct(sf ? c.growth.p3Sf : c.growth.p3All)}</td>
+                  <td className="num">{fmtPct(c.growth.pop3)}</td>
+                  <td className="num"><b>{p.scores?.get(c.geoid)?.score != null ? Math.round(p.scores.get(c.geoid)!.score!) : 'N/A'}</b></td>
                   <td><span className={`chip tone-${CLASS_LABEL[r.cls].tone}`} title={CLASS_LABEL[r.cls].long}>{CLASS_LABEL[r.cls].short}</span></td>
                 </tr>
               );

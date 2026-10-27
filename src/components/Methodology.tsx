@@ -142,6 +142,25 @@ B(y, m)   = YTD(y, m+1) − Month(y, m+1)   when the next release exists (otherw
           coverage. Pre-2022 monthly history is labeled partial and is never used in current metrics.
         </p>
 
+        <h3 id="m-score">Land Opportunity Score</h3>
+        <p>
+          A screening index for land-flipping research that combines five inputs. Each input is first converted to a{' '}
+          <b>national percentile</b> (0–100) among scored counties; the score is the weighted average of those percentiles.
+          Percentiles make inputs in different units comparable, and keep outliers such as a +400% growth rate or a
+          30,000-unit metro from dominating. Default weights: permit volume 35%, momentum (YoY) 30%, 3-year permit growth
+          (final annual files, {meta.growth.permits_from}→{meta.growth.permits_to}) 15%, population growth (PEP,{' '}
+          {meta.growth.pop_from}→{meta.growth.pop_to}) 10%, permits per 1,000 residents 10%. All weights are adjustable,
+          and adjusted weights are kept in the page link.
+        </p>
+        <p>
+          A county is scored only if both its current and prior periods are complete and its prior-period volume meets the
+          minimum-volume filter (default {t.low_baseline_units} units). Volume and momentum are required. If 3-year growth
+          (e.g. Connecticut's planning regions did not exist in {meta.growth.permits_from}) or population growth is missing,
+          its weight is redistributed and the score is marked partial. A 3-year base below the minimum volume is treated as
+          missing. Building permits count housing units authorized, not parcels or lot sales: the score indicates where
+          buildable land is being absorbed fastest. It does not reflect land prices, zoning or lot availability.
+        </p>
+
         <h3 id="m-sources">Sources</h3>
         <ul className="sources">
           <li><a href={meta.sources.bps_home} target="_blank" rel="noreferrer">Census Building Permits Survey</a> · <a href={meta.sources.bps_county_dir} target="_blank" rel="noreferrer">county files</a> · <a href={meta.sources.bps_methodology} target="_blank" rel="noreferrer">methodology</a> · <a href={meta.sources.bps_schedule} target="_blank" rel="noreferrer">release schedule</a></li>

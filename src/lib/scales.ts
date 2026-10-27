@@ -8,6 +8,8 @@ export const PALETTES = {
   // Sequential blue (reference ramp, steps 100..700) for absolute permits.
   blue: ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'],
   // Sequential violet, lightness-matched to the blue ramp (OKLCH), for per-1,000 rates.
+  // Sequential orange, lightness-matched (OKLCH), for the Land Opportunity Score heatmap.
+  orange: ['#f7d9c5', '#ecb48e', '#df8d53', '#cb6803', '#a25304', '#7c3d01', '#572900'],
   violet: ['#e2daf8', '#c7b7ef', '#ad93e4', '#946dda', '#7753b5', '#5a3d8d', '#3f2865'],
   // Diverging arms (dark -> light) and neutral midpoint for YoY growth.
   red: ['#8c2924', '#da554b', '#f3ada5'],
@@ -133,6 +135,15 @@ export function sequentialScale(values: number[], mode: 'log' | 'quantile', colo
     note = `Logarithmic classes spanning the 2nd–99.5th percentile of counties with permits (${fmt(lo)}–${fmt(hi)}).`;
   }
   return build(values, breaks, colors, fmt, zeroColor, note);
+}
+
+/** Quantile classes over all values (no separate zero class), e.g. for 0-100 scores. */
+export function quantileScale(values: number[], colors: readonly string[], k = 7, fmt: (v: number) => string = (v) => `${Math.round(v)}`): Scale {
+  const sorted = [...values].sort((a, b) => a - b);
+  if (sorted.length < 2) return build(values, [], colors, fmt, null, 'Too few values to classify');
+  const breaks = uniqueIncreasing(Array.from({ length: k - 1 }, (_, i) => Math.round(quantile(sorted, (i + 1) / k))));
+  return build(values, breaks, colors, fmt, null,
+    `Quantile classes: each holds about 1/${k} of scored counties (breaks from the data shown).`);
 }
 
 /** Diverging YoY classes: neutral band around zero, data-driven terciles on each side. */

@@ -21,6 +21,28 @@
     "warn": 1
    },
    "version": "2026-08.a711eff5"
+  },
+  {
+   "changes": {
+    "new": [],
+    "revised": []
+   },
+   "created_at": "2026-10-27T02:37:05Z",
+   "data_through": "2026-08",
+   "geography_vintage": 2025,
+   "git_commit": null,
+   "inputs_sha256": "d74664aeea1d488775c615e6f8aaecd1804cfe397f4a6cdbf8029cadd58a8bdb",
+   "population_vintage": 2025,
+   "processing_version": "1.1.0",
+   "summary": "Data through 2026-08; processing 1.0.0 -> 1.1.0",
+   "ttm_complete_counties": 3013,
+   "us_ttm_official": 1423282,
+   "validation": {
+    "fail": 0,
+    "pass": 24,
+    "warn": 1
+   },
+   "version": "2026-08.d74664ae"
   }
  ]
 }

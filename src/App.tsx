@@ -8,6 +8,7 @@ import { MapView, type MapHandle } from './components/MapView';
 import { Methodology } from './components/Methodology';
 import { RankingsTable } from './components/RankingsTable';
 import { SearchBox } from './components/SearchBox';
+import { WeightsPanel } from './components/WeightsPanel';
 import { Tooltip } from './components/Tooltip';
 import { buildCounties, loadGeoIndex, loadMeta, loadMetrics } from './lib/data';
 import { fmtInt, fmtPct, monthLabel, periodRange } from './lib/format';
@@ -16,6 +17,7 @@ import {
   type Filters, makeScale, paintFor, type Paint, type Settings, sortCounties, type SortKey, specialCounts, tableRows, toCSV,
 } from './lib/model';
 import type { SearchItem } from './lib/search';
+import { computeScores, DEFAULT_WEIGHTS, isDefaultWeights, parseWeights, type Weights, weightsString } from './lib/score';
 import type { County, GeoIndex, Meta } from './lib/types';
 
 interface Data { meta: Meta; counties: County[]; geo: GeoIndex; byId: Map<string, County> }
@@ -27,7 +29,7 @@ function readHash(lowBaseline: number) {
   const pick = <T extends string>(k: string, allowed: readonly T[], d: T): T => (allowed.includes(h.get(k) as T) ? (h.get(k) as T) : d);
   const settings: Settings = {
     view: pick('view', ['ttm', 'annual'] as const, DEFAULT_SETTINGS.view),
-    metric: pick('metric', ['abs', 'yoy', 'per'] as const, DEFAULT_SETTINGS.metric),
+    metric: pick('metric', ['abs', 'yoy', 'per', 'score'] as const, DEFAULT_SETTINGS.metric),
     units: pick('units', ['all', 'sf'] as const, DEFAULT_SETTINGS.units),
     absScale: pick('scale', ['log', 'quantile'] as const, DEFAULT_SETTINGS.absScale),
     cvd: h.get('cvd') === '1',
@@ -40,7 +42,8 @@ function readHash(lowBaseline: number) {
   };
   const county = /^\d{5}$/.test(h.get('county') ?? '') ? h.get('county') : null;
   const compare = (h.get('cmp') ?? '').split(',').filter((g) => /^\d{5}$/.test(g)).slice(0, 5);
-  return { settings, filters, county, compare };
+  const weights = parseWeights(h.get('w')) ?? { ...DEFAULT_WEIGHTS };
+  return { settings, filters, county, compare, weights };
 }
 
 export function App() {
@@ -53,6 +56,7 @@ export function App() {
   const [hover, setHover] = useState<{ geoid: string; point: { x: number; y: number } } | null>(null);
   const [methodology, setMethodology] = useState<{ section?: string } | null>(null);
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'cur', dir: 'desc' });
+  const [weights, setWeights] = useState<Weights>({ ...DEFAULT_WEIGHTS });
   const mapRef = useRef<MapHandle>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -65,6 +69,8 @@ export function App() {
         setFiltersState(st.filters);
         setSelected(st.county);
         setCompare(st.compare);
+        setWeights(st.weights);
+        if (st.settings.metric === 'score') setSort({ key: 'score', dir: 'desc' });
         setData({ meta, counties, geo, byId: new Map(counties.map((c) => [c.geoid, c])) });
       })
       .catch((e: Error) => setError(e.message));
@@ -80,6 +86,7 @@ export function App() {
       setFiltersState((f) => ({ ...st.filters, text: f.text }));
       setSelected(st.county);
       setCompare(st.compare);
+      setWeights(st.weights);
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
@@ -99,8 +106,9 @@ export function App() {
     if (filters.minPrior !== data.meta.thresholds.low_baseline_units) h.set('minprior', String(filters.minPrior));
     if (selected) h.set('county', selected);
     if (compare.length) h.set('cmp', compare.join(','));
-    history.replaceState(null, '', `#${h.toString()}`);
-  }, [data, settings, filters, selected, compare]);
+    if (!isDefaultWeights(weights)) h.set('w', weightsString(weights));
+    history.replaceState(null, '', `#${h.toString().replace(/%2C/g, ',')}`); // readable commas
+  }, [data, settings, filters, selected, compare, weights]);
 
   const lastState = useRef<string | null | undefined>(undefined);
   useEffect(() => {
@@ -113,17 +121,25 @@ export function App() {
     if (first) setTimeout(go, 400); else go();
   }, [data, filters.state]);
 
-  const set = useCallback((p: Partial<Settings>) => setSettings((s) => ({ ...s, ...p })), []);
+  const set = useCallback((p: Partial<Settings>) => {
+    // Ranking by the score is the natural view when the score map is chosen.
+    if (p.metric === 'score') setSort({ key: 'score', dir: 'desc' });
+    else if (p.metric) setSort((s) => (s.key === 'score' ? { key: 'cur', dir: 'desc' } : s));
+    setSettings((s) => ({ ...s, ...p }));
+  }, []);
   const setFilters = useCallback((p: Partial<Filters>) => setFiltersState((f) => ({ ...f, ...p })), []);
 
-  const scale = useMemo(() => (data ? makeScale(data.counties, settings, filters) : null), [data, settings, filters]);
+  const scores = useMemo(() => (data ? computeScores(data.counties, settings.view, settings.units, filters.minPrior, weights) : undefined),
+    [data, settings.view, settings.units, filters.minPrior, weights]);
+  const scale = useMemo(() => (data ? makeScale(data.counties, settings, filters, scores) : null), [data, settings, filters, scores]);
   const paints = useMemo(() => {
     const m = new Map<string, Paint>();
-    if (data && scale) for (const c of data.counties) m.set(c.geoid, paintFor(c, settings, filters, scale));
+    if (data && scale) for (const c of data.counties) m.set(c.geoid, paintFor(c, settings, filters, scale, scores));
     return m;
-  }, [data, settings, filters, scale]);
-  const special = useMemo(() => (data ? specialCounts(data.counties, settings, filters) : { nodata: 0, na: 0, low: 0 }), [data, settings, filters]);
-  const rows = useMemo(() => (data ? sortCounties(tableRows(data.counties, settings, filters), sort.key, sort.dir, settings) : []), [data, settings, filters, sort]);
+  }, [data, settings, filters, scale, scores]);
+  const special = useMemo(() => (data ? specialCounts(data.counties, settings, filters, scores) : { nodata: 0, na: 0, low: 0 }), [data, settings, filters, scores]);
+  const rows = useMemo(() => (data ? sortCounties(tableRows(data.counties, settings, filters), sort.key, sort.dir, settings, scores) : []), [data, settings, filters, sort, scores]);
+  const scoredCount = useMemo(() => (scores ? [...scores.values()].filter((r) => r.score != null).length : 0), [scores]);
 
   const selectCounty = useCallback((c: County, zoom = true) => {
     setSelected(c.geoid);
@@ -148,13 +164,13 @@ export function App() {
     const m = data.meta;
     const period = settings.view === 'ttm' ? periodRange(m.ttm.current) : `CY${m.annual.year}`;
     const prior = settings.view === 'ttm' ? periodRange(m.ttm.prior) : `CY${m.annual.prior_year}`;
-    const blob = new Blob([toCSV(rows, settings, period, prior, m.data_through)], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob([toCSV(rows, settings, period, prior, m.data_through, scores, weightsString(weights))], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `building-permits-${settings.view}-${settings.units}-${m.data_through}${filters.state ? `-${data.geo.states[filters.state].st}` : ''}.csv`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  }, [data, rows, settings, filters.state]);
+  }, [data, rows, settings, filters.state, scores, weights]);
 
   if (error) return <div className="fatal">Could not load dashboard data: {error}</div>;
   if (!data || !scale) return <div className="loading">Loading Census building permits data…</div>;
@@ -186,6 +202,10 @@ export function App() {
       <main className="layout">
         <div className="map-col">
           <Controls meta={meta} settings={settings} set={set} />
+          {settings.metric === 'score' && (
+            <WeightsPanel weights={weights} setWeights={setWeights} units={settings.units} view={settings.view}
+              years={meta.growth} minPrior={filters.minPrior} scored={scoredCount} />
+          )}
           <div className="map-wrap" ref={wrapRef}>
             <MapView ref={mapRef} fullBounds={geo.bbox} paints={paints} selected={selected} compare={compare}
               ariaLabel={`County choropleth map: ${metricTitle(settings.metric, settings.units, settings.view)}`}
@@ -205,16 +225,16 @@ export function App() {
               )}
             </div>
             {hov && hover && box && (
-              <Tooltip county={hov} point={hover.point} settings={settings} filters={filters} container={{ width: box.width, height: box.height }} />
+              <Tooltip county={hov} point={hover.point} settings={settings} filters={filters} score={scores?.get(hov.geoid)} container={{ width: box.width, height: box.height }} />
             )}
           </div>
           <Legend title={metricTitle(settings.metric, settings.units, settings.view)} scale={scale} special={special}
-            showLow={settings.metric === 'yoy'} minPrior={filters.minPrior}
+            showLow={settings.metric === 'yoy' || settings.metric === 'score'} minPrior={filters.minPrior}
             dimmedNote={filtered ? 'Breaks reflect the filtered counties; others are faded.' : null} />
         </div>
         <div className="side-col">
           {sel ? (
-            <DetailPanel county={sel} meta={meta} settings={settings} inCompare={compare.includes(sel.geoid)}
+            <DetailPanel county={sel} meta={meta} settings={settings} score={scores?.get(sel.geoid)} inCompare={compare.includes(sel.geoid)}
               onToggleCompare={() => toggleCompare(sel.geoid)} onClose={() => setSelected(null)} />
           ) : (
             <aside className="panel summary">
@@ -241,11 +261,11 @@ export function App() {
         </div>
       </main>
       {compare.length > 0 && (
-        <ComparePanel counties={compare.map((g) => byId.get(g)!).filter(Boolean)} meta={meta} settings={settings}
+        <ComparePanel counties={compare.map((g) => byId.get(g)!).filter(Boolean)} meta={meta} settings={settings} scores={scores}
           onRemove={toggleCompare} onClear={() => setCompare([])} onSelect={(c) => selectCounty(c)} />
       )}
       <RankingsTable rows={rows} total={counties.length} settings={settings} filters={filters} setFilters={setFilters}
-        sort={sort} setSort={setSort} geo={geo} selected={selected} compare={compare}
+        sort={sort} setSort={setSort} geo={geo} selected={selected} compare={compare} scores={scores}
         onRow={(c) => selectCounty(c)} onToggleCompare={toggleCompare} onExport={exportCSV}
         periodLabel={periodLabel} lowBaseline={meta.thresholds.low_baseline_units} />
       <footer className="footer">

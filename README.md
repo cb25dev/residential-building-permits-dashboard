@@ -12,6 +12,10 @@ counties with high and fast-growing residential construction.
 * **Absolute permits**: housing units authorized in the trailing 12 months
 * **YoY growth**: trailing 12 months vs the preceding 12 months
 * **Permits per 1,000 residents**: trailing units / official population × 1,000
+* **Land Opportunity Score** (0–100): a screening index for land-flipping research. It is a
+  weighted average of national percentiles for permit volume, YoY momentum, 3-year permit
+  growth, 3-year population growth and permits per resident. The weights are adjustable in
+  the dashboard ([methodology](docs/METHODOLOGY.md#8-land-opportunity-score)).
 
 Each metric has a **single-family** variant. There is also a **calendar-year view** built
 from Census's finalized annual county file. The dashboard includes hover tooltips,

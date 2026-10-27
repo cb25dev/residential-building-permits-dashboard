@@ -21386,7 +21386,7 @@
   "raw/permits/county/co1504c.txt": {
    "dataset": "bps_county",
    "first_failed_at": "2026-10-25T21:43:34Z",
-   "last_attempt_at": "2026-10-25T23:40:49Z",
+   "last_attempt_at": "2026-10-27T02:36:52Z",
    "period": "2015-04",
    "reason": "Download failed after 1 attempts: https://www2.census.gov/econ/bps/County/co1504c.txt: Got an HTML page instead of a data file: https://www2.census.gov/econ/bps/County/co1504c.txt",
    "series": "c",

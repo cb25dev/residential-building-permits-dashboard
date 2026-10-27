@@ -5,6 +5,7 @@ import { addMonths, fmtInt, fmtPct, fmtRate, monthLabel } from '../lib/format';
 import { CLASS_LABEL } from '../lib/labels';
 import { legendText } from './HistoryCharts';
 import { row, type Settings } from '../lib/model';
+import type { ScoreMap } from '../lib/score';
 import type { County, CountyHistory, Meta } from '../lib/types';
 
 // Categorical slots 1-5 in fixed order (validated adjacent-pair palette).
@@ -17,9 +18,10 @@ interface Props {
   onRemove: (geoid: string) => void;
   onClear: () => void;
   onSelect: (c: County) => void;
+  scores?: ScoreMap;
 }
 
-export function ComparePanel({ counties, meta, settings: s, onRemove, onClear, onSelect }: Props) {
+export function ComparePanel({ counties, meta, settings: s, onRemove, onClear, onSelect, scores }: Props) {
   const [hist, setHist] = useState<Record<string, CountyHistory>>({});
   useEffect(() => {
     let live = true;
@@ -56,7 +58,7 @@ export function ComparePanel({ counties, meta, settings: s, onRemove, onClear, o
       <div className="compare-body">
         <table className="table compact">
           <thead>
-            <tr><th>County</th><th className="num">Current</th><th className="num">Prior</th><th className="num">YoY</th><th className="num">Per 1,000</th><th className="num">Population</th><th className="num">SF share</th><th>Coverage</th><th /></tr>
+            <tr><th>County</th><th className="num">Current</th><th className="num">Prior</th><th className="num">YoY</th><th className="num">Per 1,000</th><th className="num">Population</th><th className="num">SF share</th><th className="num">Land score</th><th>Coverage</th><th /></tr>
           </thead>
           <tbody>
             {counties.map((c) => {
@@ -70,6 +72,7 @@ export function ComparePanel({ counties, meta, settings: s, onRemove, onClear, o
                   <td className="num">{fmtRate(sf ? r.per.sf : r.per.all)}</td>
                   <td className="num">{fmtInt(r.pop)}</td>
                   <td className="num">{r.cur.total ? `${Math.round(((r.cur.u1 ?? 0) / r.cur.total) * 100)}%` : 'N/A'}</td>
+                  <td className="num"><b>{scores?.get(c.geoid)?.score != null ? Math.round(scores.get(c.geoid)!.score!) : 'N/A'}</b></td>
                   <td><span className={`chip tone-${CLASS_LABEL[r.cls].tone}`}>{CLASS_LABEL[r.cls].short}</span></td>
                   <td><button className="btn icon" aria-label={`Remove ${c.name}`} onClick={(e) => { e.stopPropagation(); onRemove(c.geoid); }}>×</button></td>
                 </tr>

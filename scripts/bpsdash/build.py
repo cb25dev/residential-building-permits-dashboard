@@ -316,6 +316,19 @@ def run(store: RawStore, out: Path, cache: Path | None = None, log=print) -> Bui
     ):
         arank_cols[name] = ranks(vals, elig)
 
+    # --- Multi-year growth inputs (same for both views) ------------------------------
+    # Population: PEP change over three years ending at the vintage's latest year.
+    # Permits: final annual files, latest year vs three years earlier (complete records).
+    pop_from = pop_year - 3
+    pop_base = (pop_by_year.reindex(universe)[pop_from].to_numpy(dtype=float)
+                if pop_from in pop_by_year.columns else np.full(U, np.nan))
+    pop_growth = metrics.yoy_pct(pop, pop_base)
+    AY3 = AY - 3
+    a_base = {k: A[AY3][k].reindex(universe).to_numpy(dtype=float) if len(A.get(AY3, [])) else np.full(U, np.nan)
+              for k in ("u1", "total")}
+    g3_all = metrics.yoy_pct(a_cur["total"], a_base["total"])
+    g3_sf = metrics.yoy_pct(a_cur["u1"], a_base["u1"])
+
     def aflags(i):
         f = []
         if acls[i] == "complete" and a_pri["total"][i] < config.LOW_BASELINE_UNITS:
@@ -393,6 +406,11 @@ def run(store: RawStore, out: Path, cache: Path | None = None, log=print) -> Bui
             "pop": _col(pop_ay),
         },
         "recon": {"dec_ytd": _col(dec_ytd), "annual": _col(ann_tot)},
+        "growth": {
+            "pop_3y": _col(pop_growth, 2),
+            "permits_3y_all": _col(g3_all, 1), "permits_3y_sf": _col(g3_sf, 1),
+            "permits_base_all": _col(a_base["total"]), "permits_base_sf": _col(a_base["u1"]),
+        },
     }
 
     # History per state: monthly first-published, TTM, YoY; annual by type.
@@ -463,6 +481,7 @@ def run(store: RawStore, out: Path, cache: Path | None = None, log=print) -> Bui
             "divergent_counties": int(divergent.sum()),
             "statewide_offices": unalloc, "legacy_codes": legacy,
         },
+        "growth": {"pop_from": pop_from, "pop_to": pop_year, "permits_from": AY3, "permits_to": AY},
         "thresholds": {"low_baseline_units": config.LOW_BASELINE_UNITS, "small_population": config.SMALL_POPULATION,
                        "divergence_share": config.DIVERGENCE_SHARE, "divergence_min_units": config.DIVERGENCE_MIN_UNITS,
                        "high_imputation_share": config.HIGH_IMPUTATION_SHARE},
@@ -507,6 +526,7 @@ def run(store: RawStore, out: Path, cache: Path | None = None, log=print) -> Bui
                            **{f"ttm_{k}": cur[k] for k in cur}, **{f"prior_ttm_{k}": pri[k] for k in pri},
                            "yoy_pct": yoy_all, "yoy_sf_pct": yoy_sf, "per_1000": per_all, "per_1000_sf": per_sf,
                            "population": pop, "imputed_share": imputed,
+                           "pop_growth_3y_pct": pop_growth, "permits_3y_pct": g3_all, "permits_3y_sf_pct": g3_sf,
                            "flags": [";".join(flags_for(i, "ttm")) for i in range(U)]})
     cur_df.insert(4, "period_start", period_cur[0])
     cur_df.insert(5, "period_end", period_cur[1])
@@ -536,6 +556,7 @@ def run(store: RawStore, out: Path, cache: Path | None = None, log=print) -> Bui
         "full": full, "ratio": ratio, "st_ytd": st_ytd, "county": county, "state": state, "A": A, "AY": AY,
         "popdf": popdf, "geo_index": gidx, "pops": pops, "acls": acls, "a_cur": a_cur, "a_pri": a_pri,
         "aper_all": aper_all, "ayoy_all": ayoy_all, "months_c": months_c, "months_y": months_y,
+        "pop_growth": pop_growth, "pop_base": pop_base, "g3_all": g3_all, "g3_sf": g3_sf, "a_base": a_base,
     }
     return b
 

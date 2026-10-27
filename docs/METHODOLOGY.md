@@ -165,7 +165,36 @@ rounded to readable values:
   anti-diagonal hatch for *N/A (not comparable)*, and dots for *below the minimum prior
   volume*.
 
-## 8. Validation
+## 8. Land Opportunity Score
+
+A screening index for land-flipping research (dashboard metric "Land Opportunity Score").
+It is computed in the browser so the weights can be adjusted
+([`src/lib/score.ts`](../src/lib/score.ts)).
+
+| Input | Measure | Default weight |
+|---|---|---|
+| Volume | Units authorized in the current period (single-family when selected) | 35% |
+| Momentum | YoY growth vs the prior period | 30% |
+| Sustained growth | Change in final annual permits, 2022 → 2025 | 15% |
+| Population growth | PEP estimate change, 2022 → 2025 | 10% |
+| Intensity | Units per 1,000 residents | 10% |
+
+```
+percentile_i(county) = national percentile rank of input i among scored counties (ties share the average rank)
+score = Σ wᵢ · percentileᵢ / Σ wᵢ      over inputs available for the county   (0–100)
+```
+
+* Scored counties: current and prior periods complete, and prior-period volume ≥ the
+  minimum-volume filter (default 50 units). Volume and momentum are required.
+* A missing optional input (e.g. Connecticut planning regions have no 2022 annual base, or
+  a 3-year base below the minimum volume) has its weight redistributed; the score is marked partial.
+* Percentiles rather than raw values or z-scores keep heavy-tailed inputs from dominating.
+  Ranks are national and within-state among scored counties.
+* Limitations: permits count housing units, not parcels or lot sales. The score does not
+  include land prices, zoning, utilities or lot inventory. Treat it as a screen for where
+  buildable land is being absorbed, not as a valuation.
+
+## 9. Validation
 
 Every build runs 23 checks ([`scripts/bpsdash/validate.py`](../scripts/bpsdash/validate.py)).
 They include FIPS format and uniqueness; boundary and population joins; non-negative
@@ -177,7 +206,7 @@ of the latest month; row-count stability; and no regression of the reporting mon
 Tolerances were calibrated on 2022–2026 files: U.S. gaps never exceeded 0.69%, and 99% of
 state-months were within 0.95%.
 
-## 9. Map projection
+## 10. Map projection
 
 Counties are drawn in a composite equal-area layout: Albers (EPSG:5070) for the lower 48
 and DC, Alaska Albers (EPSG:3338, scaled to 35%) and Hawaii Albers (ESRI:102007) as

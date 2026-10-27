@@ -3,6 +3,7 @@ import { loadStateHistory } from '../lib/data';
 import { fmtInt, fmtPct, fmtRate, fmtShare, periodRange } from '../lib/format';
 import { CLASS_LABEL, FLAG_LABEL } from '../lib/labels';
 import { row, type Settings } from '../lib/model';
+import { COMPONENTS, type ScoreResult } from '../lib/score';
 import type { County, CountyHistory, Meta, RankTuple } from '../lib/types';
 import { HistoryCharts, SERIES } from './HistoryCharts';
 
@@ -11,6 +12,7 @@ interface Props {
   meta: Meta;
   settings: Settings;
   inCompare: boolean;
+  score?: ScoreResult;
   onToggleCompare: () => void;
   onClose: () => void;
 }
@@ -20,7 +22,7 @@ function Rank({ r }: { r: RankTuple }) {
   return <span>#{fmtInt(r[0])} <span className="muted">of {fmtInt(r[1])}</span></span>;
 }
 
-export function DetailPanel({ county: c, meta, settings: s, inCompare, onToggleCompare, onClose }: Props) {
+export function DetailPanel({ county: c, meta, settings: s, score, inCompare, onToggleCompare, onClose }: Props) {
   const [hist, setHist] = useState<CountyHistory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +83,42 @@ export function DetailPanel({ county: c, meta, settings: s, inCompare, onToggleC
           </tbody>
         </table>
         <p className="muted small">Ranked among counties with comparable data; growth ranks exclude prior periods under {meta.thresholds.low_baseline_units} units.</p>
+      </section>
+
+      <section className="score-section">
+        <h3>Land Opportunity Score <span className="muted">· {s.units === 'sf' ? 'single-family' : 'all residential'}</span></h3>
+        {score?.score != null ? (
+          <>
+            <div className="kpis two">
+              <div className="kpi"><span>Score (0–100)</span><b>{Math.round(score.score)}</b><small>{score.partial ? 'partial: some inputs N/A' : 'all inputs available'}</small></div>
+              <div className="kpi"><span>Rank</span><b>#{fmtInt(score.rank[0])}</b><small>of {fmtInt(score.rank[1])} · #{score.rank[2]} of {score.rank[3]} in {c.st}</small></div>
+            </div>
+            <table className="score-parts">
+              <thead><tr><th>Input</th><th className="num">Value</th><th className="num">Percentile</th><th className="num">Weight</th></tr></thead>
+              <tbody>
+                {score.parts.map((p) => {
+                  const def = COMPONENTS.find((d) => d.key === p.key)!;
+                  const val = p.value == null ? 'N/A' : p.key === 'volume' ? fmtInt(p.value) : p.key === 'intensity' ? fmtRate(p.value) : fmtPct(p.value);
+                  return (
+                    <tr key={p.key} title={def.describe(s.units, s.view, meta.growth)}>
+                      <th>{def.label}</th>
+                      <td className="num">{val}</td>
+                      <td className="num">{p.pct == null ? 'N/A' : Math.round(p.pct)}<span className="pctbar"><span style={{ width: `${p.pct ?? 0}%` }} /></span></td>
+                      <td className="num muted">{Math.round(p.weight * 100)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <p className="muted small">Percentiles are national, among scored counties. Change the weights above the map when the score is selected.</p>
+          </>
+        ) : (
+          <p className="small muted">
+            {score?.status === 'low' ? `Not scored: prior-period volume is below the minimum (${s.units === 'sf' ? 'single-family ' : ''}units).`
+              : score?.status === 'nodata' ? 'Not scored: no Census permit data for this county.'
+              : 'Not scored: current and prior periods are not both available.'}
+          </p>
+        )}
       </section>
 
       <section>

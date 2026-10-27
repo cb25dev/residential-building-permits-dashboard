@@ -168,6 +168,17 @@ def run(b, out: Path, previous_release: dict | None = None, allow_regress: bool 
           f"vintage {meta['population']['vintage']}, July 1 {meta['population']['year']}; "
           f"min population {int(np.nanmin(pop))}")
 
+    # 8b. Multi-year growth inputs
+    pb, pg = n["pop_base"], n["pop_growth"]
+    exp_pg = np.where(pb > 0, (pop / np.where(pb > 0, pb, 1) - 1) * 100, np.nan)
+    ab, g3 = n["a_base"]["total"], n["g3_all"]
+    exp_g3 = np.where(ab > 0, (n["a_cur"]["total"] / np.where(ab > 0, ab, 1) - 1) * 100, np.nan)
+    ok_g = np.allclose(pg, exp_pg, equal_nan=True) and np.allclose(g3, exp_g3, equal_nan=True)
+    gm = meta["growth"]
+    r.add("growth_inputs", "Population and 3-year permit growth match their definitions", ok_g,
+          f"population {gm['pop_from']}->{gm['pop_to']}: {int(np.sum(~np.isnan(pg)))} counties; permits "
+          f"CY{gm['permits_from']}->CY{gm['permits_to']} (final annual files): {int(np.sum(~np.isnan(g3)))} counties")
+
     # 9. Duplicate county-period combinations in processed outputs
     hist = pd.read_parquet(out / "processed" / "county_monthly_history.parquet", columns=["geoid", "period"])
     dups = int(hist.duplicated().sum())

@@ -148,6 +148,14 @@ export const MapView = forwardRef<MapHandle, Props>(function MapView(
       setReady(true);
     });
 
+    // Keep the whole country framed while the container settles into its final size,
+    // until the user pans or zooms.
+    let interacted = false;
+    const frame = () => m.fitBounds([[fullBounds[0], fullBounds[1]], [fullBounds[2], fullBounds[3]]], { padding: 24, duration: 0 });
+    m.on('dragstart', () => { interacted = true; });
+    m.on('zoomstart', (e) => { if ((e as { originalEvent?: Event }).originalEvent) interacted = true; });
+    m.once('load', () => { m.resize(); frame(); });
+
     let raf = 0;
     m.on('mousemove', 'county-fill', (e) => {
       const f = e.features?.[0];
@@ -175,7 +183,7 @@ export const MapView = forwardRef<MapHandle, Props>(function MapView(
       cb.current.onSelect((f?.properties?.GEOID as string) ?? null, oe.shiftKey || oe.metaKey || oe.ctrlKey);
     });
 
-    const ro = new ResizeObserver(() => m.resize());
+    const ro = new ResizeObserver(() => { m.resize(); if (!interacted) frame(); });
     ro.observe(el.current);
     return () => {
       ro.disconnect();

@@ -1,7 +1,7 @@
 // Shapes of the artifacts written by the Python pipeline (scripts/bpsdash/build.py).
 
 export type View = 'ttm' | 'annual';
-export type Metric = 'abs' | 'yoy' | 'per';
+export type Metric = 'abs' | 'yoy' | 'per' | 'score';
 export type Units = 'all' | 'sf';
 export type AbsScale = 'log' | 'quantile';
 
@@ -37,6 +37,7 @@ export interface MetricsFile {
   ttm: ViewColumns;
   annual: ViewColumns;
   recon: { dec_ytd: Num[]; annual: Num[] };
+  growth: { pop_3y: Num[]; permits_3y_all: Num[]; permits_3y_sf: Num[]; permits_base_all: Num[]; permits_base_sf: Num[] };
 }
 
 export interface ViewRow {
@@ -63,6 +64,7 @@ export interface County {
   ttm: ViewRow;
   annual: ViewRow;
   recon: { decYtd: Num; annual: Num };
+  growth: { pop3: Num; p3All: Num; p3Sf: Num; p3BaseAll: Num; p3BaseSf: Num };
 }
 
 export interface GeoIndex {
@@ -101,6 +103,7 @@ export interface Meta {
     statewide_offices: { statefp: string; state: string; name: string; ttm_units: number | null; annual_units: number | null }[];
     legacy_codes: { geoid: string; name: string; first: string; last: string }[];
   };
+  growth: { pop_from: number; pop_to: number; permits_from: number; permits_to: number };
   thresholds: { low_baseline_units: number; small_population: number; divergence_share: number; divergence_min_units: number; high_imputation_share: number };
   history: { start: string; months: number; month_full: boolean[]; ttm_full: boolean[]; annual_start: number; annual_years: number };
   sources: {

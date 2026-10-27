@@ -48,8 +48,8 @@ export function Controls({ meta, settings: s, set }: Props) {
         {s.metric === 'score' && s.units !== 'sf' && (
           <span className="hint">Tip: single-family units track buildable-lot demand most closely.</span>
         )}
-        {s.metric === 'yoy' && (
-          <label className="check" title="Swap green for blue on the growth side (red–blue diverging scale for color-vision deficiencies)">
+        {(s.metric === 'yoy' || s.metric === 'score') && (
+          <label className="check" title="Swap green for blue (red–blue scale for color-vision deficiencies)">
             <input type="checkbox" checked={s.cvd} onChange={(e) => set({ cvd: e.target.checked })} />
             Color-vision friendly
           </label>

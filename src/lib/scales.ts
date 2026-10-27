@@ -8,8 +8,11 @@ export const PALETTES = {
   // Sequential blue (reference ramp, steps 100..700) for absolute permits.
   blue: ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'],
   // Sequential violet, lightness-matched to the blue ramp (OKLCH), for per-1,000 rates.
-  // Sequential orange, lightness-matched (OKLCH), for the Land Opportunity Score heatmap.
-  orange: ['#f7d9c5', '#ecb48e', '#df8d53', '#cb6803', '#a25304', '#7c3d01', '#572900'],
+  // Land Opportunity Score: red (weak) -> yellow (middling) -> green (strong). The yellow
+  // midpoint is saturated so it stays distinct from the gray no-data fills; the
+  // color-vision-friendly variant swaps the green arm for blue.
+  scoreRYG: ['#b2182b', '#e0533a', '#f39c45', '#f2cc4d', '#a6cc5a', '#4ba64f', '#1a7837'],
+  scoreRYB: ['#b2182b', '#e0533a', '#f39c45', '#f2cc4d', '#9ec5f4', '#3987e5', '#184f95'],
   violet: ['#e2daf8', '#c7b7ef', '#ad93e4', '#946dda', '#7753b5', '#5a3d8d', '#3f2865'],
   // Diverging arms (dark -> light) and neutral midpoint for YoY growth.
   red: ['#8c2924', '#da554b', '#f3ada5'],

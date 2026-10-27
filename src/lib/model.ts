@@ -67,7 +67,7 @@ export function makeScale(counties: County[], s: Settings, f: Filters, scores?: 
     if (!passes(c, f, s.view) || status(c, s, f, scores) !== 'value') continue;
     vals.push(metricValue(c, s, scores)!);
   }
-  if (s.metric === 'score') return quantileScale(vals, PALETTES.orange);
+  if (s.metric === 'score') return quantileScale(vals, s.cvd ? PALETTES.scoreRYB : PALETTES.scoreRYG);
   if (s.metric === 'abs') return sequentialScale(vals, s.absScale, PALETTES.blue, PALETTES.zeroBlue);
   if (s.metric === 'per') return sequentialScale(vals, 'quantile', PALETTES.violet, PALETTES.zeroViolet, 7);
   return divergingScale(vals, PALETTES.red, s.cvd ? PALETTES.blueArm : PALETTES.green, PALETTES.neutral);

@@ -161,6 +161,9 @@ rounded to readable values:
   option swaps green for blue.
 * **Permits per 1,000** use a sequential violet ramp, lightness-matched to the blue ramp
   in OKLCH, with quantile classes.
+* **Land Opportunity Score** uses red (weak) → yellow (middling) → green (strong) with
+  quantile classes, so yellow marks the middle band of scored counties. The
+  color-vision-friendly option swaps green for blue.
 * Missing states use distinct patterns: diagonal hatch for *no BPS county data*,
   anti-diagonal hatch for *N/A (not comparable)*, and dots for *below the minimum prior
   volume*.

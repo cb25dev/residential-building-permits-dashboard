@@ -5888,6 +5888,22 @@
    "source_url": "https://www2.census.gov/econ/bps/County/co1503y.txt",
    "stored_as": "raw/permits/county/co1503y.txt.gz"
   },
+  "raw/permits/county/co1504c.txt": {
+   "bytes": 86526,
+   "dataset": "bps_county",
+   "downloaded_at": "2026-10-28T18:56:47Z",
+   "http_last_modified": "Fri, 30 Sep 2016 13:10:09 GMT",
+   "period": "2015-04",
+   "revisions": [],
+   "series": "c",
+   "sha256": "48403a02576f4bdf27a8401e683d22bccd3c02a90e8bb8f577be06a22f90cdeb",
+   "source_agency": "U.S. Census Bureau",
+   "source_filename": "co1504c.txt",
+   "source_listing_last_modified": "2016-09-30 09:10",
+   "source_listing_timezone": "America/New_York (Census web server listing)",
+   "source_url": "https://www2.census.gov/econ/bps/County/co1504c.txt",
+   "stored_as": "raw/permits/county/co1504c.txt.gz"
+  },
   "raw/permits/county/co1504y.txt": {
    "bytes": 92202,
    "dataset": "bps_county",
@@ -10703,6 +10719,38 @@
    "source_listing_timezone": "America/New_York (Census web server listing)",
    "source_url": "https://www2.census.gov/econ/bps/County/co2608y.txt",
    "stored_as": "raw/permits/county/co2608y.txt.gz"
+  },
+  "raw/permits/county/co2609c.txt": {
+   "bytes": 421210,
+   "dataset": "bps_county",
+   "downloaded_at": "2026-10-28T18:56:47Z",
+   "http_last_modified": "Tue, 27 Oct 2026 11:45:25 GMT",
+   "period": "2026-09",
+   "revisions": [],
+   "series": "c",
+   "sha256": "7ddc0da1002ed06e811c4a7f80d432b737094fe3906cb9e47cff577408f15485",
+   "source_agency": "U.S. Census Bureau",
+   "source_filename": "co2609c.txt",
+   "source_listing_last_modified": "2026-10-27 07:45",
+   "source_listing_timezone": "America/New_York (Census web server listing)",
+   "source_url": "https://www2.census.gov/econ/bps/County/co2609c.txt",
+   "stored_as": "raw/permits/county/co2609c.txt.gz"
+  },
+  "raw/permits/county/co2609y.txt": {
+   "bytes": 458563,
+   "dataset": "bps_county",
+   "downloaded_at": "2026-10-28T18:56:47Z",
+   "http_last_modified": "Tue, 27 Oct 2026 11:45:25 GMT",
+   "period": "2026-09",
+   "revisions": [],
+   "series": "y",
+   "sha256": "0f3a2be70348d2d2dcafcdc88559a0c2035aedd0677b6fce3584dfb7f6de5813",
+   "source_agency": "U.S. Census Bureau",
+   "source_filename": "co2609y.txt",
+   "source_listing_last_modified": "2026-10-27 07:45",
+   "source_listing_timezone": "America/New_York (Census web server listing)",
+   "source_url": "https://www2.census.gov/econ/bps/County/co2609y.txt",
+   "stored_as": "raw/permits/county/co2609y.txt.gz"
   },
   "raw/permits/state/st0001c.txt": {
    "bytes": 8267,
@@ -21360,6 +21408,38 @@
    "source_url": "https://www2.census.gov/econ/bps/State/st2608y.txt",
    "stored_as": "raw/permits/state/st2608y.txt.gz"
   },
+  "raw/permits/state/st2609c.txt": {
+   "bytes": 8598,
+   "dataset": "bps_state",
+   "downloaded_at": "2026-10-28T18:56:47Z",
+   "http_last_modified": "Tue, 27 Oct 2026 11:45:26 GMT",
+   "period": "2026-09",
+   "revisions": [],
+   "series": "c",
+   "sha256": "99fcb5a9399ec7d1d6e20f1746b0c620c6a2b375b144fceef84127e213517eda",
+   "source_agency": "U.S. Census Bureau",
+   "source_filename": "st2609c.txt",
+   "source_listing_last_modified": "2026-10-27 07:45",
+   "source_listing_timezone": "America/New_York (Census web server listing)",
+   "source_url": "https://www2.census.gov/econ/bps/State/st2609c.txt",
+   "stored_as": "raw/permits/state/st2609c.txt.gz"
+  },
+  "raw/permits/state/st2609y.txt": {
+   "bytes": 10154,
+   "dataset": "bps_state",
+   "downloaded_at": "2026-10-28T18:56:47Z",
+   "http_last_modified": "Tue, 27 Oct 2026 11:45:26 GMT",
+   "period": "2026-09",
+   "revisions": [],
+   "series": "y",
+   "sha256": "296987d586dc6a46d55a81709db21a437e14cb006c4dab07d2a4f8bca7d5945b",
+   "source_agency": "U.S. Census Bureau",
+   "source_filename": "st2609y.txt",
+   "source_listing_last_modified": "2026-10-27 07:45",
+   "source_listing_timezone": "America/New_York (Census web server listing)",
+   "source_url": "https://www2.census.gov/econ/bps/State/st2609y.txt",
+   "stored_as": "raw/permits/state/st2609y.txt.gz"
+  },
   "raw/population/co-est2025-alldata.csv": {
    "bytes": 2071735,
    "dataset": "pep_county",
@@ -21382,15 +21462,5 @@
   }
  },
  "schema": 1,
- "unavailable": {
-  "raw/permits/county/co1504c.txt": {
-   "dataset": "bps_county",
-   "first_failed_at": "2026-10-25T21:43:34Z",
-   "last_attempt_at": "2026-10-27T02:36:52Z",
-   "period": "2015-04",
-   "reason": "Download failed after 1 attempts: https://www2.census.gov/econ/bps/County/co1504c.txt: Got an HTML page instead of a data file: https://www2.census.gov/econ/bps/County/co1504c.txt",
-   "series": "c",
-   "source_url": "https://www2.census.gov/econ/bps/County/co1504c.txt"
-  }
- }
+ "unavailable": {}
 }

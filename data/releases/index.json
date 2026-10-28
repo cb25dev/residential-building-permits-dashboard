@@ -43,6 +43,34 @@
     "warn": 1
    },
    "version": "2026-08.d74664ae"
+  },
+  {
+   "changes": {
+    "new": [
+     "raw/permits/county/co1504c.txt",
+     "raw/permits/county/co2609c.txt",
+     "raw/permits/county/co2609y.txt",
+     "raw/permits/state/st2609c.txt",
+     "raw/permits/state/st2609y.txt"
+    ],
+    "revised": []
+   },
+   "created_at": "2026-10-28T18:57:30Z",
+   "data_through": "2026-09",
+   "geography_vintage": 2025,
+   "git_commit": "e089b94e378e5898f55a818670c771151ac5c4dc",
+   "inputs_sha256": "43205028ac4a25fb0b24e56277f10ee180fea6e9b2c56c95e6409f87daa68150",
+   "population_vintage": 2025,
+   "processing_version": "1.1.0",
+   "summary": "Data through 2026-09; new reporting month (was 2026-08)",
+   "ttm_complete_counties": 3015,
+   "us_ttm_official": 1421324,
+   "validation": {
+    "fail": 0,
+    "pass": 24,
+    "warn": 1
+   },
+   "version": "2026-09.43205028"
   }
  ]
 }
